@@ -7,25 +7,34 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app">
-        <header>
-            <h1>Заметки и Задачи</h1>
-            <button id="addFolderBtn">+ Папка</button>
-        </header>
-        <main id="foldersContainer"></main>
-    </div>
 
-    <!-- Модальные окна -->
-    <div id="modal" class="modal hidden">
-        <div class="modal-content">
-            <h2 id="modalTitle"></h2>
-            <input type="text" id="modalInput" placeholder="Название">
-            <button id="saveBtn">Сохранить</button>
-            <button id="closeBtn">Закрыть</button>
+<div class="app">
+
+    <header>
+        <h1>Заметки и задачи</h1>
+        <button id="addFolderBtn" class="icon-btn">+</button>
+    </header>
+
+    <div id="foldersContainer" class="folder-list"></div>
+
+    <button id="addTaskGlobal" class="main-action">+ Новая задача</button>
+</div>
+
+
+<!-- Модальное окно -->
+<div id="modal" class="modal hidden">
+    <div class="modal-content">
+        <h2 id="modalTitle"></h2>
+        <input id="modalInput" type="text" placeholder="Введите название...">
+        
+        <div class="modal-buttons">
+            <button id="saveBtn" class="modal-save">Сохранить</button>
+            <button id="closeBtn" class="modal-close">Закрыть</button>
         </div>
     </div>
+</div>
 
-    <script src="script.js"></script>
+
+<script src="script.js"></script>
 </body>
 </html>
-
