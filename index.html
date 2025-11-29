@@ -3,17 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Мини To-Do</title>
+<title>Мини To-Do + Заметки</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="container">
-  <h1>🖤 To-Do Мини</h1>
-  <div class="input-group">
-    <input type="text" id="taskInput" placeholder="Добавить задачу...">
-    <button id="addBtn">Добавить</button>
+  <h1>🖤 Мини To-Do & Заметки</h1>
+
+  <!-- Вкладки -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="tasks">Задачи</button>
+    <button class="tab-btn" data-tab="notes">Заметки</button>
   </div>
-  <ul id="taskList"></ul>
+
+  <!-- Раздел Задач -->
+  <div class="tab-content" id="tasks">
+    <div class="input-group">
+      <input type="text" id="taskInput" placeholder="Добавить задачу...">
+      <button id="addBtn">Добавить</button>
+    </div>
+    <ul id="taskList"></ul>
+  </div>
+
+  <!-- Раздел Заметок -->
+  <div class="tab-content" id="notes" style="display:none">
+    <div class="input-group">
+      <input type="text" id="noteInput" placeholder="Добавить заметку...">
+      <button id="addNoteBtn">Добавить</button>
+    </div>
+    <ul id="noteList"></ul>
+  </div>
 </div>
 <script src="script.js"></script>
 </body>
