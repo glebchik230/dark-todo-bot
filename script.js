@@ -1,3 +1,10 @@
+/* Telegram WebApp Init */
+if (window.Telegram && Telegram.WebApp) {
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+    Telegram.WebApp.disableVerticalSwipe();
+}
+
 let folders = JSON.parse(localStorage.getItem("folders")) || [];
 
 const foldersContainer = document.getElementById("foldersContainer");
