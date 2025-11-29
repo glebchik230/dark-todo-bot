@@ -1,6 +1,3 @@
-// Вставь сюда токен своего бота
-const TELEGRAM_BOT_TOKEN = "8546788734:AAGyK7m1RqmU6wASq6fp4hLH34gNJsA14rQ";
-
 // --- Сохраняем chat_id локально ---
 let TELEGRAM_CHAT_ID = localStorage.getItem("chat_id") || "";
 
@@ -12,17 +9,14 @@ if (!TELEGRAM_CHAT_ID) {
   }
 }
 
-// --- Функция отправки сообщений ---
-function sendToTelegram(message) {
+// --- Функция отправки сообщений на локальный сервер ---
+function sendToServer(message) {
   if (!TELEGRAM_CHAT_ID) return;
-  fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+  fetch("http://localhost:3000/send", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: TELEGRAM_CHAT_ID,
-      text: message
-    })
-  }).catch(err => console.error(err));
+    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, message })
+  }).catch(err => console.error("Ошибка отправки на сервер:", err));
 }
 
 // --- Задачи ---
@@ -47,7 +41,7 @@ function renderTasks() {
 
     const sendBtn = document.createElement("button");
     sendBtn.textContent = "Отправить боту";
-    sendBtn.onclick = () => sendToTelegram("Задача: " + task);
+    sendBtn.onclick = () => sendToServer("Задача: " + task);
 
     li.appendChild(delBtn);
     li.appendChild(sendBtn);
@@ -66,7 +60,7 @@ addBtn.onclick = () => {
   tasks.push(val);
   taskInput.value = "";
   saveTasks();
-  sendToTelegram("Новая задача: " + val); // отправка сразу при добавлении
+  sendToServer("Новая задача: " + val); // отправка сразу при добавлении
 };
 
 // --- Заметки ---
@@ -91,7 +85,7 @@ function renderNotes() {
 
     const sendBtn = document.createElement("button");
     sendBtn.textContent = "Отправить боту";
-    sendBtn.onclick = () => sendToTelegram("Заметка: " + note);
+    sendBtn.onclick = () => sendToServer("Заметка: " + note);
 
     li.appendChild(delBtn);
     li.appendChild(sendBtn);
@@ -110,7 +104,7 @@ addNoteBtn.onclick = () => {
   notes.push(val);
   noteInput.value = "";
   saveNotes();
-  sendToTelegram("Новая заметка: " + val); // отправка сразу при добавлении
+  sendToServer("Новая заметка: " + val); // отправка сразу при добавлении
 };
 
 // --- Вкладки ---
