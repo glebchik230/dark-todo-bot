@@ -1,80 +1,79 @@
-const noteInput = document.getElementById("noteInput");
-const addNoteBtn = document.getElementById("addNoteBtn");
-const noteList = document.getElementById("noteList");
-const folderBtns = document.querySelectorAll(".folder-btn");
+let folders = JSON.parse(localStorage.getItem('folders')) || [];
+const foldersContainer = document.getElementById('foldersContainer');
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+const modalInput = document.getElementById('modalInput');
+const saveBtn = document.getElementById('saveBtn');
+const closeBtn = document.getElementById('closeBtn');
+let currentAction = null;
+let currentFolderIndex = null;
 
-let currentFolder = "general";
-let notes = JSON.parse(localStorage.getItem("notes")) || {};
-
-// --- Переключение папок с анимацией ---
-folderBtns.forEach(btn => {
-  btn.addEventListener("click", () => {
-    folderBtns.forEach(f => f.classList.remove("active"));
-    btn.classList.add("active");
-
-    // плавное скрытие старых заметок
-    const oldNotes = document.querySelectorAll("#noteList li");
-    oldNotes.forEach(li => li.style.opacity = 0);
-
-    setTimeout(() => {
-      currentFolder = btn.dataset.folder;
-      renderNotes();
-    }, 200); // небольшая задержка для эффекта
-  });
-});
-
-// --- Добавление заметки ---
-addNoteBtn.onclick = () => {
-  const val = noteInput.value.trim();
-  if (!val) return;
-
-  if (!notes[currentFolder]) notes[currentFolder] = [];
-  notes[currentFolder].push({ text: val, completed: false });
-
-  noteInput.value = "";
-  saveNotes();
-};
-
-// --- Рендер заметок с анимацией ---
-function renderNotes() {
-  noteList.innerHTML = "";
-  if (!notes[currentFolder]) return;
-
-  notes[currentFolder].forEach((note, idx) => {
-    const li = document.createElement("li");
-    li.textContent = note.text;
-    if (note.completed) li.classList.add("completed");
-
-    // кнопка выполнения
-    const completeBtn = document.createElement("button");
-    completeBtn.textContent = note.completed ? "↺" : "✔";
-    completeBtn.onclick = () => {
-      note.completed = !note.completed;
-      saveNotes();
-    };
-
-    // кнопка удаления
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "Удалить";
-    delBtn.onclick = () => {
-      notes[currentFolder].splice(idx,1);
-      saveNotes();
-    };
-
-    li.appendChild(completeBtn);
-    li.appendChild(delBtn);
-
-    // добавляем задержку для плавного появления
-    li.style.animationDelay = `${idx * 0.05}s`;
-    noteList.appendChild(li);
-  });
+function render() {
+    foldersContainer.innerHTML = '';
+    folders.forEach((folder, fIndex) => {
+        const folderEl = document.createElement('div');
+        folderEl.className = 'folder';
+        folderEl.innerHTML = `
+            <h3>${folder.name} <button onclick="addTask(${fIndex})">+ Задача</button></h3>
+            <div class="tasks">
+                ${folder.tasks.map((task, tIndex) => `
+                    <div class="task ${task.completed ? 'completed' : ''}">
+                        <span onclick="toggleTask(${fIndex}, ${tIndex})">${task.name}</span>
+                        <button onclick="deleteTask(${fIndex}, ${tIndex})">🗑</button>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        foldersContainer.appendChild(folderEl);
+    });
 }
 
-// --- Сохраняем локально ---
-function saveNotes() {
-  localStorage.setItem("notes", JSON.stringify(notes));
-  renderNotes();
+function addFolder() {
+    currentAction = 'folder';
+    modalTitle.textContent = 'Новая папка';
+    modalInput.value = '';
+    modal.classList.remove('hidden');
 }
 
-// --- Инициализация ---
-renderNotes();
+function addTask(folderIndex) {
+    currentAction = 'task';
+    currentFolderIndex = folderIndex;
+    modalTitle.textContent = 'Новая задача';
+    modalInput.value = '';
+    modal.classList.remove('hidden');
+}
+
+function save() {
+    const value = modalInput.value.trim();
+    if (!value) return;
+    if (currentAction === 'folder') {
+        folders.push({ name: value, tasks: [] });
+    } else if (currentAction === 'task') {
+        folders[currentFolderIndex].tasks.push({ name: value, completed: false });
+    }
+    localStorage.setItem('folders', JSON.stringify(folders));
+    modal.classList.add('hidden');
+    render();
+}
+
+function closeModal() {
+    modal.classList.add('hidden');
+}
+
+function toggleTask(fIndex, tIndex) {
+    folders[fIndex].tasks[tIndex].completed = !folders[fIndex].tasks[tIndex].completed;
+    localStorage.setItem('folders', JSON.stringify(folders));
+    render();
+}
+
+function deleteTask(fIndex, tIndex) {
+    folders[fIndex].tasks.splice(tIndex,1);
+    localStorage.setItem('folders', JSON.stringify(folders));
+    render();
+}
+
+document.getElementById('addFolderBtn').addEventListener('click', addFolder);
+saveBtn.addEventListener('click', save);
+closeBtn.addEventListener('click', closeModal);
+
+render();
