@@ -1,39 +1,48 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Мини To-Do + Заметки</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ToDo — Telegram Mini App</title>
+<style>
+:root {
+  --bg:#070708;
+  --panel:#0f1112;
+  --muted:#9aa0a6;
+  --accent:#7c5cff;
+}
+body {margin:0; font-family:Inter,sans-serif; background:var(--bg); color:#e7e9eb;}
+.wrap { max-width:700px; margin:36px auto; padding:28px; }
+h1 { margin:0; font-size:20px; }
+input, button { padding:8px; margin:4px; border-radius:6px; border:none; }
+button { cursor:pointer; background:var(--accent); color:#fff; }
+.tab-content { display:none; margin-top:12px; }
+.tab-btn.active { background:#3f3bff; }
+ul { list-style:none; padding:0; }
+li { margin-bottom:6px; display:flex; gap:6px; align-items:center; }
+</style>
 </head>
 <body>
-<div class="container">
-  <h1>🖤 Мини To-Do & Заметки</h1>
-
-  <!-- Вкладки -->
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="tasks">Задачи</button>
-    <button class="tab-btn" data-tab="notes">Заметки</button>
+<div class="wrap">
+  <h1>Мини ToDo</h1>
+  <div>
+    <button class="tab-btn active" data-tab="tasksTab">Задачи</button>
+    <button class="tab-btn" data-tab="notesTab">Заметки</button>
   </div>
 
-  <!-- Раздел Задач -->
-  <div class="tab-content" id="tasks">
-    <div class="input-group">
-      <input type="text" id="taskInput" placeholder="Добавить задачу...">
-      <button id="addBtn">Добавить</button>
-    </div>
+  <div id="tasksTab" class="tab-content" style="display:block">
+    <input id="taskInput" placeholder="Новая задача">
+    <button id="addBtn">Добавить</button>
     <ul id="taskList"></ul>
   </div>
 
-  <!-- Раздел Заметок -->
-  <div class="tab-content" id="notes" style="display:none">
-    <div class="input-group">
-      <input type="text" id="noteInput" placeholder="Добавить заметку...">
-      <button id="addNoteBtn">Добавить</button>
-    </div>
+  <div id="notesTab" class="tab-content">
+    <input id="noteInput" placeholder="Новая заметка">
+    <button id="addNoteBtn">Добавить</button>
     <ul id="noteList"></ul>
   </div>
 </div>
+
 <script src="script.js"></script>
 </body>
 </html>
