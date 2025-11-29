@@ -1,7 +1,20 @@
-const TELEGRAM_BOT_TOKEN = "8546788734:AAGyK7m1RqmU6wASq6fp4hLH34gNJsA14rQ"; // вставь сюда токен
-const TELEGRAM_CHAT_ID = "ТВОЙ_USER_ID"; // вставь сюда свой ID
+// Вставь сюда токен своего бота
+const TELEGRAM_BOT_TOKEN = "8546788734:AAGyK7m1RqmU6wASq6fp4hLH34gNJsA14rQ";
 
+// --- Сохраняем chat_id локально ---
+let TELEGRAM_CHAT_ID = localStorage.getItem("chat_id") || "";
+
+// --- Если chat_id ещё нет, запрашиваем ---
+if (!TELEGRAM_CHAT_ID) {
+  TELEGRAM_CHAT_ID = prompt("Введите ваш chat_id из Telegram (через /setid у бота)");
+  if (TELEGRAM_CHAT_ID) {
+    localStorage.setItem("chat_id", TELEGRAM_CHAT_ID);
+  }
+}
+
+// --- Функция отправки сообщений ---
 function sendToTelegram(message) {
+  if (!TELEGRAM_CHAT_ID) return;
   fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -53,6 +66,7 @@ addBtn.onclick = () => {
   tasks.push(val);
   taskInput.value = "";
   saveTasks();
+  sendToTelegram("Новая задача: " + val); // отправка сразу при добавлении
 };
 
 // --- Заметки ---
@@ -96,6 +110,7 @@ addNoteBtn.onclick = () => {
   notes.push(val);
   noteInput.value = "";
   saveNotes();
+  sendToTelegram("Новая заметка: " + val); // отправка сразу при добавлении
 };
 
 // --- Вкладки ---
