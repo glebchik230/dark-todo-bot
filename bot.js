@@ -2,7 +2,7 @@ const { Telegraf } = require("telegraf");
 const fs = require("fs");
 
 // Вставь сюда токен от BotFather
-const bot = new Telegraf("ТОКЕН_ОТ_BOTFATHER");
+const bot = new Telegraf("8546788734:AAGyK7m1RqmU6wASq6fp4hLH34gNJsA14rQ");
 
 // Локальное хранение задач
 const DB_FILE = "todos.json";
