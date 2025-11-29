@@ -1,15 +1,16 @@
-// Вкладки
-const tabBtns = document.querySelectorAll(".tab-btn");
-const tabContents = document.querySelectorAll(".tab-content");
+const TELEGRAM_BOT_TOKEN = "8546788734:AAGyK7m1RqmU6wASq6fp4hLH34gNJsA14rQ"; // вставь сюда токен
+const TELEGRAM_CHAT_ID = "ТВОЙ_USER_ID"; // вставь сюда свой ID
 
-tabBtns.forEach(btn => {
-  btn.addEventListener("click", () => {
-    tabBtns.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    tabContents.forEach(tc => tc.style.display = "none");
-    document.getElementById(btn.dataset.tab).style.display = "block";
-  });
-});
+function sendToTelegram(message) {
+  fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: TELEGRAM_CHAT_ID,
+      text: message
+    })
+  }).catch(err => console.error(err));
+}
 
 // --- Задачи ---
 const taskInput = document.getElementById("taskInput");
@@ -31,7 +32,12 @@ function renderTasks() {
       saveTasks();
     };
 
+    const sendBtn = document.createElement("button");
+    sendBtn.textContent = "Отправить боту";
+    sendBtn.onclick = () => sendToTelegram("Задача: " + task);
+
     li.appendChild(delBtn);
+    li.appendChild(sendBtn);
     taskList.appendChild(li);
   });
 }
@@ -69,7 +75,12 @@ function renderNotes() {
       saveNotes();
     };
 
+    const sendBtn = document.createElement("button");
+    sendBtn.textContent = "Отправить боту";
+    sendBtn.onclick = () => sendToTelegram("Заметка: " + note);
+
     li.appendChild(delBtn);
+    li.appendChild(sendBtn);
     noteList.appendChild(li);
   });
 }
@@ -87,12 +98,18 @@ addNoteBtn.onclick = () => {
   saveNotes();
 };
 
-// --- Напоминания каждые 30 минут ---
-setInterval(() => {
-  if (tasks.length > 0) {
-    alert("⏰ У тебя есть задачи в списке!");
-  }
-}, 1800000);
+// --- Вкладки ---
+const tabBtns = document.querySelectorAll(".tab-btn");
+const tabContents = document.querySelectorAll(".tab-content");
+
+tabBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    tabBtns.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    tabContents.forEach(tc => tc.style.display = "none");
+    document.getElementById(btn.dataset.tab).style.display = "block";
+  });
+});
 
 renderTasks();
 renderNotes();
