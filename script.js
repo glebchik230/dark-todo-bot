@@ -1,22 +1,25 @@
-// --- Сохраняем chat_id локально ---
-let TELEGRAM_CHAT_ID = localStorage.getItem("chat_id") || "";
+// --- Вставьте сюда токен вашего бота ---
+const TELEGRAM_BOT_TOKEN = "ВАШ_ТОКЕН_БОТА";
 
-// --- Если chat_id ещё нет, запрашиваем ---
+// Получаем chat_id: либо через prompt, либо через Telegram WebApp API
+let TELEGRAM_CHAT_ID = localStorage.getItem("chat_id") || "";
 if (!TELEGRAM_CHAT_ID) {
-  TELEGRAM_CHAT_ID = prompt("Введите ваш chat_id из Telegram (через /setid у бота)");
-  if (TELEGRAM_CHAT_ID) {
-    localStorage.setItem("chat_id", TELEGRAM_CHAT_ID);
+  if (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
+    TELEGRAM_CHAT_ID = window.Telegram.WebApp.initDataUnsafe.user.id;
+  } else {
+    TELEGRAM_CHAT_ID = prompt("Введите ваш chat_id из Telegram (через /setid у бота)");
   }
+  if (TELEGRAM_CHAT_ID) localStorage.setItem("chat_id", TELEGRAM_CHAT_ID);
 }
 
-// --- Функция отправки сообщений на локальный сервер ---
-function sendToServer(message) {
+// --- Функция отправки сообщений боту ---
+function sendToTelegram(message) {
   if (!TELEGRAM_CHAT_ID) return;
-  fetch("http://localhost:3000/send", {
+  fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, message })
-  }).catch(err => console.error("Ошибка отправки на сервер:", err));
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message })
+  }).catch(err => console.error("Ошибка отправки в Telegram:", err));
 }
 
 // --- Задачи ---
@@ -28,21 +31,15 @@ let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
 function renderTasks() {
   taskList.innerHTML = "";
-  tasks.forEach((task, index) => {
+  tasks.forEach((task,index)=>{
     const li = document.createElement("li");
     li.textContent = task;
-
     const delBtn = document.createElement("button");
     delBtn.textContent = "Удалить";
-    delBtn.onclick = () => {
-      tasks.splice(index, 1);
-      saveTasks();
-    };
-
+    delBtn.onclick = ()=>{ tasks.splice(index,1); saveTasks(); };
     const sendBtn = document.createElement("button");
     sendBtn.textContent = "Отправить боту";
-    sendBtn.onclick = () => sendToServer("Задача: " + task);
-
+    sendBtn.onclick = ()=>sendToTelegram("Задача: "+task);
     li.appendChild(delBtn);
     li.appendChild(sendBtn);
     taskList.appendChild(li);
@@ -58,9 +55,9 @@ addBtn.onclick = () => {
   const val = taskInput.value.trim();
   if (!val) return;
   tasks.push(val);
-  taskInput.value = "";
+  taskInput.value="";
   saveTasks();
-  sendToServer("Новая задача: " + val); // отправка сразу при добавлении
+  sendToTelegram("Новая задача: "+val);
 };
 
 // --- Заметки ---
@@ -71,22 +68,16 @@ const noteList = document.getElementById("noteList");
 let notes = JSON.parse(localStorage.getItem("notes")) || [];
 
 function renderNotes() {
-  noteList.innerHTML = "";
-  notes.forEach((note, index) => {
+  noteList.innerHTML="";
+  notes.forEach((note,index)=>{
     const li = document.createElement("li");
     li.textContent = note;
-
     const delBtn = document.createElement("button");
-    delBtn.textContent = "Удалить";
-    delBtn.onclick = () => {
-      notes.splice(index, 1);
-      saveNotes();
-    };
-
+    delBtn.textContent="Удалить";
+    delBtn.onclick=()=>{ notes.splice(index,1); saveNotes(); };
     const sendBtn = document.createElement("button");
-    sendBtn.textContent = "Отправить боту";
-    sendBtn.onclick = () => sendToServer("Заметка: " + note);
-
+    sendBtn.textContent="Отправить боту";
+    sendBtn.onclick=()=>sendToTelegram("Заметка: "+note);
     li.appendChild(delBtn);
     li.appendChild(sendBtn);
     noteList.appendChild(li);
@@ -98,25 +89,24 @@ function saveNotes() {
   renderNotes();
 }
 
-addNoteBtn.onclick = () => {
+addNoteBtn.onclick=()=>{
   const val = noteInput.value.trim();
-  if (!val) return;
+  if(!val) return;
   notes.push(val);
-  noteInput.value = "";
+  noteInput.value="";
   saveNotes();
-  sendToServer("Новая заметка: " + val); // отправка сразу при добавлении
+  sendToTelegram("Новая заметка: "+val);
 };
 
 // --- Вкладки ---
 const tabBtns = document.querySelectorAll(".tab-btn");
 const tabContents = document.querySelectorAll(".tab-content");
-
-tabBtns.forEach(btn => {
-  btn.addEventListener("click", () => {
-    tabBtns.forEach(b => b.classList.remove("active"));
+tabBtns.forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    tabBtns.forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
-    tabContents.forEach(tc => tc.style.display = "none");
-    document.getElementById(btn.dataset.tab).style.display = "block";
+    tabContents.forEach(tc=>tc.style.display="none");
+    document.getElementById(btn.dataset.tab).style.display="block";
   });
 });
 
