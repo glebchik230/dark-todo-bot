@@ -1,5 +1,5 @@
 // --- Токен бота ---
-const TELEGRAM_BOT_TOKEN = "ВАШ_ТОКЕН_БОТА";
+const TELEGRAM_BOT_TOKEN = "8546788734:AAGyK7m1RqmU6wASq6fp4hLH34gNJsA14rQ";
 
 let TELEGRAM_CHAT_ID = localStorage.getItem("chat_id") || "";
 if (!TELEGRAM_CHAT_ID) {
