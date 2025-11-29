@@ -1,113 +1,68 @@
-// --- Токен бота ---
-const TELEGRAM_BOT_TOKEN = "8546788734:AAGyK7m1RqmU6wASq6fp4hLH34gNJsA14rQ";
-
-let TELEGRAM_CHAT_ID = localStorage.getItem("chat_id") || "";
-if (!TELEGRAM_CHAT_ID) {
-  if (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
-    TELEGRAM_CHAT_ID = window.Telegram.WebApp.initDataUnsafe.user.id;
-  } else {
-    TELEGRAM_CHAT_ID = prompt("Введите ваш chat_id из Telegram");
-  }
-  if (TELEGRAM_CHAT_ID) localStorage.setItem("chat_id", TELEGRAM_CHAT_ID);
-}
-
-function sendToTelegram(message){
-  if(!TELEGRAM_CHAT_ID) return;
-  fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({chat_id:TELEGRAM_CHAT_ID,text:message})
-  }).catch(err=>console.error("Ошибка отправки:",err));
-}
-
-// --- Задачи ---
-const taskInput = document.getElementById("taskInput");
-const addBtn = document.getElementById("addBtn");
-const taskList = document.getElementById("taskList");
-
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-
-function renderTasks(){
-  taskList.innerHTML="";
-  tasks.forEach((task,index)=>{
-    const li=document.createElement("li");
-    li.textContent=task;
-    const delBtn=document.createElement("button");
-    delBtn.textContent="Удалить";
-    delBtn.onclick=()=>{tasks.splice(index,1);saveTasks();};
-    const sendBtn=document.createElement("button");
-    sendBtn.textContent="Отправить";
-    sendBtn.onclick=()=>sendToTelegram("Задача: "+task);
-    li.appendChild(delBtn);
-    li.appendChild(sendBtn);
-    taskList.appendChild(li);
-  });
-}
-
-function saveTasks(){
-  localStorage.setItem("tasks",JSON.stringify(tasks));
-  renderTasks();
-}
-
-addBtn.onclick=()=>{
-  const val=taskInput.value.trim();
-  if(!val) return;
-  tasks.push(val);
-  taskInput.value="";
-  saveTasks();
-  sendToTelegram("Новая задача: "+val);
-};
-
-// --- Заметки ---
 const noteInput = document.getElementById("noteInput");
 const addNoteBtn = document.getElementById("addNoteBtn");
 const noteList = document.getElementById("noteList");
+const folderBtns = document.querySelectorAll(".folder-btn");
 
-let notes = JSON.parse(localStorage.getItem("notes")) || [];
+let currentFolder = "general";
+let notes = JSON.parse(localStorage.getItem("notes")) || {};
 
-function renderNotes(){
-  noteList.innerHTML="";
-  notes.forEach((note,index)=>{
-    const li=document.createElement("li");
-    li.textContent=note;
-    const delBtn=document.createElement("button");
-    delBtn.textContent="Удалить";
-    delBtn.onclick=()=>{notes.splice(index,1);saveNotes();};
-    const sendBtn=document.createElement("button");
-    sendBtn.textContent="Отправить";
-    sendBtn.onclick=()=>sendToTelegram("Заметка: "+note);
+// --- Переключение папок ---
+folderBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    folderBtns.forEach(f => f.classList.remove("active"));
+    btn.classList.add("active");
+    currentFolder = btn.dataset.folder;
+    renderNotes();
+  });
+});
+
+// --- Добавление заметки ---
+addNoteBtn.onclick = () => {
+  const val = noteInput.value.trim();
+  if (!val) return;
+
+  if (!notes[currentFolder]) notes[currentFolder] = [];
+  notes[currentFolder].push({ text: val, completed: false });
+
+  noteInput.value = "";
+  saveNotes();
+};
+
+// --- Рендер заметок ---
+function renderNotes() {
+  noteList.innerHTML = "";
+  if (!notes[currentFolder]) return;
+
+  notes[currentFolder].forEach((note, idx) => {
+    const li = document.createElement("li");
+    li.textContent = note.text;
+    if (note.completed) li.classList.add("completed");
+
+    const completeBtn = document.createElement("button");
+    completeBtn.textContent = note.completed ? "↺" : "✔";
+    completeBtn.onclick = () => {
+      note.completed = !note.completed;
+      saveNotes();
+    };
+
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "Удалить";
+    delBtn.onclick = () => {
+      notes[currentFolder].splice(idx,1);
+      saveNotes();
+    };
+
+    li.appendChild(completeBtn);
     li.appendChild(delBtn);
-    li.appendChild(sendBtn);
     noteList.appendChild(li);
   });
 }
 
-function saveNotes(){
-  localStorage.setItem("notes",JSON.stringify(notes));
+// --- Сохраняем локально ---
+function saveNotes() {
+  localStorage.setItem("notes", JSON.stringify(notes));
   renderNotes();
 }
 
-addNoteBtn.onclick=()=>{
-  const val=noteInput.value.trim();
-  if(!val) return;
-  notes.push(val);
-  noteInput.value="";
-  saveNotes();
-  sendToTelegram("Новая заметка: "+val);
-};
-
-// --- Вкладки ---
-const tabBtns=document.querySelectorAll(".tab-btn");
-const tabContents=document.querySelectorAll(".tab-content");
-
-tabBtns.forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    tabBtns.forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    tabContents.forEach(tc=>tc.style.display="none");
-    document.getElementById(btn.dataset.tab).style.display="block";
-  });
-});
-
-renderTasks();
+// --- Инициализация ---
 renderNotes();
