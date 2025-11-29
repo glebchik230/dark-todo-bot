@@ -1,119 +1,98 @@
-/* Telegram WebApp Init */
-if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
-    Telegram.WebApp.disableVerticalSwipe();
-}
+let folders = JSON.parse(localStorage.getItem("folders")) || {};
+let currentFolder = null;
 
-let folders = JSON.parse(localStorage.getItem("folders")) || [];
-
-const foldersContainer = document.getElementById("foldersContainer");
-const addFolderBtn = document.getElementById("addFolderBtn");
-const addTaskGlobal = document.getElementById("addTaskGlobal");
-
-const modal = document.getElementById("modal");
-const modalTitle = document.getElementById("modalTitle");
-const modalInput = document.getElementById("modalInput");
-const saveBtn = document.getElementById("saveBtn");
-const closeBtn = document.getElementById("closeBtn");
-
-let currentAction = null;
-let selectedFolder = null;
-
-/* RENDER */
-function render() {
-    foldersContainer.innerHTML = "";
-
-    folders.forEach((folder, index) => {
-        const completed = folder.tasks.filter(t => t.completed).length;
-
-        const el = document.createElement("div");
-        el.className = "folder";
-        el.innerHTML = `
-            <div class="folder-title">${folder.name}</div>
-            <div class="folder-info">${folder.tasks.length} задач • ${completed} выполнено</div>
-        `;
-
-        el.onclick = () => openFolder(index);
-
-        foldersContainer.appendChild(el);
-    });
-
+// Сохраняем в LS
+function save() {
     localStorage.setItem("folders", JSON.stringify(folders));
 }
 
-/* FOLDER OPEN */
-function openFolder(index) {
-    const folder = folders[index];
-    let output = "";
+// Показываем папки
+function renderFolders() {
+    const container = document.getElementById("folders");
+    container.innerHTML = "";
 
-    folder.tasks.forEach((task, tIndex) => {
-        output += `
-            <div class="folder" style="margin-bottom:10px;" onclick="toggleTask(${index}, ${tIndex})">
-                <div class="folder-title" style="${task.completed ? 'text-decoration: line-through; opacity:0.6;' : ''}">
-                    ${task.name}
-                </div>
-            </div>
+    Object.keys(folders).forEach(folderName => {
+        const div = document.createElement("div");
+        div.className = "folder";
+        div.innerHTML = `
+            <span class="folder-name">${folderName}</span>
+            <button onclick="openFolder('${folderName}')">Открыть</button>
         `;
+        container.appendChild(div);
+    });
+}
+
+renderFolders();
+
+// Создать папку
+function createFolder() {
+    const name = document.getElementById("newFolderName").value.trim();
+    if (!name) return;
+
+    folders[name] = [];
+    save();
+    renderFolders();
+
+    document.getElementById("newFolderName").value = "";
+}
+
+// Открыть папку
+function openFolder(name) {
+    currentFolder = name;
+
+    document.getElementById("folderTitle").innerText = name;
+    document.getElementById("tasksSection").classList.remove("hidden");
+    document.getElementById("folders").classList.add("hidden");
+
+    renderTasks();
+}
+
+// Закрыть папку
+function closeFolder() {
+    currentFolder = null;
+
+    document.getElementById("tasksSection").classList.add("hidden");
+    document.getElementById("folders").classList.remove("hidden");
+}
+
+// Создать задачу
+function createTask() {
+    const name = document.getElementById("newTaskName").value.trim();
+    if (!name || !currentFolder) return;
+
+    folders[currentFolder].push({
+        text: name,
+        done: false
     });
 
-    foldersContainer.innerHTML = `
-        <button class="icon-btn" onclick="render()">←</button>
-        <h2 style="margin: 15px 0;">${folder.name}</h2>
-        ${output}
-        <button class="main-action" onclick="addTask(${index})">+ Новая задача</button>
-    `;
+    save();
+    renderTasks();
+
+    document.getElementById("newTaskName").value = "";
 }
 
-/* ADD FOLDER */
-addFolderBtn.onclick = () => {
-    currentAction = "folder";
-    modalTitle.textContent = "Новая папка";
-    modalInput.value = "";
-    modal.classList.remove("hidden");
-};
+// Рендер задач
+function renderTasks() {
+    const container = document.getElementById("tasks");
+    container.innerHTML = "";
 
-/* ADD TASK (global button chooses folder automatically later) */
-addTaskGlobal.onclick = () => {
-    if (folders.length === 0) {
-        alert("Сначала создайте хотя бы одну папку");
-        return;
-    }
-    alert("Откройте папку и нажмите «+ Новая задача»");
-};
+    folders[currentFolder].forEach((task, index) => {
+        const div = document.createElement("div");
+        div.className = "task" + (task.done ? " completed" : "");
 
-/* ADD TASK inside folder */
-function addTask(folderIndex) {
-    currentAction = "task";
-    selectedFolder = folderIndex;
-    modalTitle.textContent = "Новая задача";
-    modalInput.value = "";
-    modal.classList.remove("hidden");
+        div.innerHTML = `
+            <span>${task.text}</span>
+            <input type="checkbox" class="checkbox" ${task.done ? "checked" : ""}
+                onclick="toggleTask(${index})">
+        `;
+
+        container.appendChild(div);
+    });
 }
 
-/* SAVE NEW ITEM */
-saveBtn.onclick = () => {
-    const value = modalInput.value.trim();
-    if (!value) return;
-
-    if (currentAction === "folder") {
-        folders.push({ name: value, tasks: [] });
-    } else if (currentAction === "task") {
-        folders[selectedFolder].tasks.push({ name: value, completed: false });
-    }
-
-    modal.classList.add("hidden");
-    render();
-};
-
-/* CLOSE MODAL */
-closeBtn.onclick = () => modal.classList.add("hidden");
-
-/* TOGGLE TASK COMPLETE */
-function toggleTask(fIndex, tIndex) {
-    const task = folders[fIndex].tasks[tIndex];
-    task.completed = !task.completed;
-    render();
+// Переключить задачу
+function toggleTask(index) {
+    folders[currentFolder][index].done = !folders[currentFolder][index].done;
+    save();
+    renderTasks();
 }
-
-render();
