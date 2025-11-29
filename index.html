@@ -1,34 +1,31 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Заметки — Dark Green Minimal</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заметки и задачи</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>Мои заметки</h1>
-    <p class="lead">Тёмное минималистичное приложение для заметок и задач</p>
-  </header>
-
-  <div class="folders">
-    <button class="folder-btn active" data-folder="general">Общее</button>
-    <button class="folder-btn" data-folder="work">Работа</button>
-    <button class="folder-btn" data-folder="personal">Личное</button>
-    <button id="newFolderBtn" class="btn-accent">+ Новая папка</button>
-  </div>
-
-  <div class="notes-section">
-    <div class="input-group">
-      <input type="text" id="noteInput" placeholder="Новая заметка">
-      <button id="addNoteBtn" class="btn-accent">Добавить</button>
+    <div class="app">
+        <header>
+            <h1>Заметки и Задачи</h1>
+            <button id="addFolderBtn">+ Папка</button>
+        </header>
+        <main id="foldersContainer"></main>
     </div>
-    <ul id="noteList"></ul>
-  </div>
-</div>
 
-<script src="script.js"></script>
+    <!-- Модальные окна -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="modalTitle"></h2>
+            <input type="text" id="modalInput" placeholder="Название">
+            <button id="saveBtn">Сохранить</button>
+            <button id="closeBtn">Закрыть</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
+
