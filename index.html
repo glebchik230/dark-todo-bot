@@ -1,141 +1,30 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Мини ToDo — Dark Minimal</title>
-<link rel="icon" href="data:;base64,iVBORw0KGgo=">
-<style>
-:root {
-  --bg:#070708;
-  --panel:#0f1112;
-  --muted:#9aa0a6;
-  --accent:#7c5cff;
-  --glass: rgba(255,255,255,0.03);
-  --radius:12px;
-  --transition:.25s;
-}
-
-*{box-sizing:border-box;}
-body{
-  margin:0;
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  background:linear-gradient(180deg,var(--bg) 0%, #0b0c0d 100%);
-  color:#e7e9eb;
-  -webkit-font-smoothing:antialiased;
-}
-
-.wrap{
-  max-width:700px;
-  margin:36px auto;
-  padding:28px;
-}
-
-h1{
-  margin:0 0 12px 0;
-  font-size:24px;
-}
-
-input{
-  padding:10px;
-  border-radius:var(--radius);
-  border:none;
-  background:var(--panel);
-  color:#e7e9eb;
-  width:70%;
-}
-
-button{
-  padding:10px 16px;
-  border-radius:var(--radius);
-  border:none;
-  cursor:pointer;
-  font-weight:600;
-  transition: var(--transition);
-}
-
-button:hover{
-  opacity:.85;
-}
-
-.btn-accent{
-  background: var(--accent);
-  color:white;
-}
-
-.tabs{
-  display:flex;
-  gap:12px;
-  margin-bottom:18px;
-}
-
-.tab-btn{
-  flex:1;
-  padding:10px;
-  background:var(--panel);
-  color:#e7e9eb;
-  font-weight:500;
-  transition: var(--transition);
-}
-
-.tab-btn.active{
-  background: var(--accent);
-  color:white;
-}
-
-.tab-content{
-  display:none;
-  animation: fadeIn var(--transition) ease-in-out;
-}
-
-ul{
-  list-style:none;
-  padding:0;
-  margin-top:12px;
-}
-
-li{
-  background:var(--panel);
-  margin-bottom:10px;
-  padding:10px;
-  border-radius:var(--radius);
-  display:flex;
-  justify-content: space-between;
-  align-items:center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
-li button{
-  margin-left:6px;
-  background:var(--accent);
-  color:white;
-  font-size:12px;
-  padding:6px 10px;
-}
-
-@keyframes fadeIn{
-  from{opacity:0;}
-  to{opacity:1;}
-}
-</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Заметки — Dark Green Minimal</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="wrap">
-  <h1>Мини ToDo</h1>
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="tasksTab">Задачи</button>
-    <button class="tab-btn" data-tab="notesTab">Заметки</button>
+  <header>
+    <h1>Мои заметки</h1>
+    <p class="lead">Тёмное минималистичное приложение для заметок и задач</p>
+  </header>
+
+  <div class="folders">
+    <button class="folder-btn active" data-folder="general">Общее</button>
+    <button class="folder-btn" data-folder="work">Работа</button>
+    <button class="folder-btn" data-folder="personal">Личное</button>
+    <button id="newFolderBtn" class="btn-accent">+ Новая папка</button>
   </div>
 
-  <div id="tasksTab" class="tab-content" style="display:block">
-    <input id="taskInput" placeholder="Новая задача">
-    <button id="addBtn" class="btn-accent">Добавить</button>
-    <ul id="taskList"></ul>
-  </div>
-
-  <div id="notesTab" class="tab-content">
-    <input id="noteInput" placeholder="Новая заметка">
-    <button id="addNoteBtn" class="btn-accent">Добавить</button>
+  <div class="notes-section">
+    <div class="input-group">
+      <input type="text" id="noteInput" placeholder="Новая заметка">
+      <button id="addNoteBtn" class="btn-accent">Добавить</button>
+    </div>
     <ul id="noteList"></ul>
   </div>
 </div>
