@@ -6,13 +6,20 @@ const folderBtns = document.querySelectorAll(".folder-btn");
 let currentFolder = "general";
 let notes = JSON.parse(localStorage.getItem("notes")) || {};
 
-// --- Переключение папок ---
+// --- Переключение папок с анимацией ---
 folderBtns.forEach(btn => {
   btn.addEventListener("click", () => {
     folderBtns.forEach(f => f.classList.remove("active"));
     btn.classList.add("active");
-    currentFolder = btn.dataset.folder;
-    renderNotes();
+
+    // плавное скрытие старых заметок
+    const oldNotes = document.querySelectorAll("#noteList li");
+    oldNotes.forEach(li => li.style.opacity = 0);
+
+    setTimeout(() => {
+      currentFolder = btn.dataset.folder;
+      renderNotes();
+    }, 200); // небольшая задержка для эффекта
   });
 });
 
@@ -28,7 +35,7 @@ addNoteBtn.onclick = () => {
   saveNotes();
 };
 
-// --- Рендер заметок ---
+// --- Рендер заметок с анимацией ---
 function renderNotes() {
   noteList.innerHTML = "";
   if (!notes[currentFolder]) return;
@@ -38,6 +45,7 @@ function renderNotes() {
     li.textContent = note.text;
     if (note.completed) li.classList.add("completed");
 
+    // кнопка выполнения
     const completeBtn = document.createElement("button");
     completeBtn.textContent = note.completed ? "↺" : "✔";
     completeBtn.onclick = () => {
@@ -45,6 +53,7 @@ function renderNotes() {
       saveNotes();
     };
 
+    // кнопка удаления
     const delBtn = document.createElement("button");
     delBtn.textContent = "Удалить";
     delBtn.onclick = () => {
@@ -54,6 +63,9 @@ function renderNotes() {
 
     li.appendChild(completeBtn);
     li.appendChild(delBtn);
+
+    // добавляем задержку для плавного появления
+    li.style.animationDelay = `${idx * 0.05}s`;
     noteList.appendChild(li);
   });
 }
